@@ -1,0 +1,21 @@
+# --- Interfaz y Configuración ---
+gradio>=4.0.0
+python-dotenv>=1.0.0
+
+# --- IA y LangChain ---
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-chroma>=0.1.0
+openai>=1.10.0
+tiktoken>=0.5.0
+
+# --- Base de Datos Vectorial ---
+chromadb>=0.4.22
+
+# --- Datos y Generación Sintética ---
+pandas>=2.1.0
+faker>=2.0.0
+
+# --- Seguridad y Validación ---
+bcrypt>=4.1.0
+pydantic>=2.5.0
