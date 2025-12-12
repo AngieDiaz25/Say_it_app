@@ -205,3 +205,35 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- Entornos Virtuales ---
+venv/
+env/
+.env
+.venv
+
+# --- Variables de Entorno y Secretos (CRÍTICO) ---
+.env
+*.env
+keys/
+secrets/
+
+# --- Base de Datos Vectorial y Local ---
+*.db
+*.sqlite3
+chroma_db/
+data/vector_store/
+
+# --- Datos Sintéticos o Crudos (No subir datos pesados) ---
+data/raw/
+data/synthetic/
+
+# --- Python & Cache ---
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# --- IDEs & OS ---
+.vscode/
+.idea/
+.DS_Store
