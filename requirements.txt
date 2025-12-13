@@ -1,18 +1,22 @@
-# --- Interfaz y Configuración ---
+# --- Interfaz de Usuario ---
 gradio>=4.0.0
+
+# --- Gestión de Entorno ---
 python-dotenv>=1.0.0
 
-# --- IA y LangChain ---
+# --- Orquestación de IA (VERSIÓN GEMINI) ---
 langchain>=0.1.0
-langchain-openai>=0.0.5
+langchain-community>=0.0.10
+langchain-google-genai>=0.0.3  
 langchain-chroma>=0.1.0
-openai>=1.10.0
-tiktoken>=0.5.0
 
 # --- Base de Datos Vectorial ---
 chromadb>=0.4.22
 
-# --- Datos y Generación Sintética ---
+# --- Procesamiento de Archivos ---
+pypdf>=4.0.0                    # Para leer los protocolos del colegio
+
+# --- Datos y Generación ---
 pandas>=2.1.0
 faker>=2.0.0
 
