@@ -1,71 +1,52 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
-# --- TABLAS DE ESTRUCTURA ---
-
 class CentroEstudios(db.Model):
-    __tablename__ = 'centro_estudios'
+    __tablename__ = 'centros_estudios'
     id_centro_estudios = db.Column(db.Integer, primary_key=True)
-    codigo = db.Column(db.String(50))
-    denominacion_generica_es = db.Column(db.String(100)) 
-    denominacion_especifica = db.Column(db.String(100))  
-    direccion = db.Column(db.String(200))
-    localidad = db.Column(db.String(100))
-    provincia = db.Column(db.String(100))
-    telefono = db.Column(db.String(20))
-    id_director = db.Column(db.Integer, db.ForeignKey('directores.id_director'))
-
-class Clase(db.Model):
-    __tablename__ = 'clase'
-    id_clase = db.Column(db.Integer, primary_key=True)
-    nombre_clase = db.Column(db.String(50))
-
-# --- USUARIOS ---
+    denominacion_generica_es = db.Column(db.String(100))
+    denominacion_especifica = db.Column(db.String(100))
+    id_director = db.Column(db.Integer, nullable=True)
 
 class Director(db.Model):
     __tablename__ = 'directores'
     id_director = db.Column(db.Integer, primary_key=True)
     nombre_director = db.Column(db.String(100))
-    email_director = db.Column(db.String(100))
-    telefono_director = db.Column(db.String(20))
-    pass_director = db.Column(db.String(255))
+    email_director = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.String(128))
 
 class Tutor(db.Model):
-    __tablename__ = 'tutor'
+    __tablename__ = 'tutores'
     id_tutor = db.Column(db.Integer, primary_key=True)
     nombre_tutor = db.Column(db.String(100))
-    email_tutor = db.Column(db.String(100))
-    telefono_tutor = db.Column(db.String(20))
-    pass_tutor = db.Column(db.String(255))
+    email_tutor = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.String(128))
+    id_centro_estudios = db.Column(db.Integer, db.ForeignKey('centros_estudios.id_centro_estudios'))
 
-class Profesor(db.Model):
-    __tablename__ = 'profesor'
+class Profesor(db.Model): # <--- ¡ESTA ES LA CLASE QUE FALTABA!
+    __tablename__ = 'profesores'
     id_profesor = db.Column(db.Integer, primary_key=True)
     nombre_profesor = db.Column(db.String(100))
-    mail_profesor = db.Column(db.String(100))
-    pass_profesor = db.Column(db.String(255))
-    id_clase = db.Column(db.Integer, db.ForeignKey('clase.id_clase'))
+    email_profesor = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.String(128))
+    id_centro_estudios = db.Column(db.Integer, db.ForeignKey('centros_estudios.id_centro_estudios'))
 
 class Alumno(db.Model):
-    __tablename__ = 'alumno'
+    __tablename__ = 'alumnos'
     id_alumno = db.Column(db.Integer, primary_key=True)
     nombre_alumno = db.Column(db.String(100))
-    # --- NUEVO CAMPO ---
-    email_alumno = db.Column(db.String(100)) 
-    # -------------------
-    pass_alumno = db.Column(db.String(255))
-    id_centro_estudios = db.Column(db.Integer, db.ForeignKey('centro_estudios.id_centro_estudios'))
-    id_tutor = db.Column(db.Integer, db.ForeignKey('tutor.id_tutor'))
-    id_clase = db.Column(db.Integer, db.ForeignKey('clase.id_clase'))
-
-# --- OPERATIVA ---
+    email_alumno = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.String(128))
+    id_centro_estudios = db.Column(db.Integer, db.ForeignKey('centros_estudios.id_centro_estudios'))
+    id_tutor = db.Column(db.Integer, db.ForeignKey('tutores.id_tutor'))
 
 class Informe(db.Model):
-    __tablename__ = 'informe'
+    __tablename__ = 'informes'
     id_informe = db.Column(db.Integer, primary_key=True)
-    fecha_informe = db.Column(db.DateTime, default=db.func.current_timestamp())
-    tipo_bullying = db.Column(db.String(50))
-    descripcion = db.Column(db.String(1000))
-    id_centro_estudios = db.Column(db.Integer, db.ForeignKey('centro_estudios.id_centro_estudios'))
-    id_director = db.Column(db.Integer, db.ForeignKey('directores.id_director'))
+    tipo_bullying = db.Column(db.String(100))
+    descripcion = db.Column(db.Text)
+    fecha_informe = db.Column(db.DateTime, default=datetime.utcnow)
+    id_centro_estudios = db.Column(db.Integer)
+    id_director = db.Column(db.Integer)

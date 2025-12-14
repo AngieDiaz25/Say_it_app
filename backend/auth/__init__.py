@@ -3,32 +3,34 @@ from backend.models import Alumno, Director, Profesor, Tutor
 
 def autenticar_usuario(email, password):
     """
-    Busca al usuario por EMAIL en todas las tablas.
-    Contraseña universal para pruebas: '1234'
+    Busca al usuario en todas las tablas (Alumno, Director, Tutor, Profesor).
+    Verifica la contraseña contra el campo 'password_hash'.
     """
-    # 1. Intentar como ALUMNO (Login por EMAIL)
-    # Antes buscábamos por 'nombre_alumno', ahora por 'email_alumno'
+    
+    # 1. Buscar en ALUMNOS
     alumno = Alumno.query.filter_by(email_alumno=email).first()
     if alumno:
-        if alumno.pass_alumno == password or check_password_hash(alumno.pass_alumno, password):
+        # Nota: En producción usaríamos check_password_hash. 
+        # Para la demo, comparamos texto plano porque reset_db.py guardó "1234" tal cual.
+        if alumno.password_hash == password:
             return "alumno", alumno.nombre_alumno
-
-    # 2. Intentar como DIRECTOR (Login por EMAIL)
+    
+    # 2. Buscar en DIRECTORES
     director = Director.query.filter_by(email_director=email).first()
     if director:
-        if director.pass_director == password or check_password_hash(director.pass_director, password):
+        if director.password_hash == password:
             return "director", director.nombre_director
 
-    # 3. Intentar como PROFESOR (Login por EMAIL - ojo, la columna es mail_profesor)
-    profesor = Profesor.query.filter_by(mail_profesor=email).first()
-    if profesor:
-        if profesor.pass_profesor == password or check_password_hash(profesor.pass_profesor, password):
-            return "profesor", profesor.nombre_profesor
-
-    # 4. Intentar como TUTOR (Login por EMAIL)
+    # 3. Buscar en TUTORES
     tutor = Tutor.query.filter_by(email_tutor=email).first()
     if tutor:
-        if tutor.pass_tutor == password or check_password_hash(tutor.pass_tutor, password):
+        if tutor.password_hash == password:
             return "tutor", tutor.nombre_tutor
+            
+    # 4. Buscar en PROFESORES
+    profesor = Profesor.query.filter_by(email_profesor=email).first()
+    if profesor:
+        if profesor.password_hash == password:
+            return "profesor", profesor.nombre_profesor
 
     return "error", None
