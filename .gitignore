@@ -1,0 +1,21 @@
+# --- Entornos Virtuales y Configuración del Sistema ---
+venv/
+.env
+.DS_Store
+__pycache__/
+*.pyc
+
+# --- Bases de Datos y Archivos Locales ---
+*.db
+instance/
+chroma_db/
+documentos_rag/
+
+# --- Logs y Reportes Generados ---
+logs/
+reports/
+data/reports/*.pdf
+
+# --- Carpetas temporales de IDEs ---
+.idea/
+.vscode/
