@@ -18,4 +18,4 @@ data/reports/*.pdf
 
 # --- Carpetas temporales de IDEs ---
 .idea/
-.vscode/
+.vscode/.env

@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()  # Carga las variables del archivo .env automáticamente
+
 import gradio as gr
 import os
 import pandas as pd
@@ -8,6 +11,7 @@ from backend.auth import autenticar_usuario
 from backend.agents import responder_alumno, generar_reporte_riesgo
 from backend.reporting import generar_pdf_informe
 from backend.email_service import enviar_notificacion_protocolo
+
 
 # --- CONFIGURACIÓN ---
 app = Flask(__name__)
