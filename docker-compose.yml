@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
-  say-it-app:
+  say_it_app:
     build: .
+    container_name: say_it_container
     ports:
-      - "7860:7860"
+      - "5000:5000"
     volumes:
       - ./data:/app/data
     env_file:
       - .env
-    environment:
-      - GRADIO_SERVER_NAME=0.0.0.0
+    restart: unless-stopped
