@@ -276,6 +276,17 @@ custom_css = """
         padding: 24px !important;
     }
 }
+.logo-title-bar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 12px;
+  padding: 10px 0 0 0;
+}
+.brand-title h2{
+  margin: 0 !important;
+}
+
 """
 
 # --- 3. LÓGICA DE NEGOCIO (BACKEND) ---
@@ -544,13 +555,18 @@ tema = gr.themes.Base(
 
 with gr.Blocks(theme=tema, css=custom_css, title="Say It - App Anti-Bullying") as demo:
 
-    with gr.Row(elem_classes="logo-container"):
+    with gr.Row(elem_classes="logo-title-bar"):
         gr.Image(
             value="assets/logo.jpeg",
             show_label=False,
             interactive=False,
-            height=120
+            height=56,
+            width=56,
+            container=False
         )
+        gr.Markdown("## Say It", elem_classes="brand-title")
+
+
 
     
     # Estados
