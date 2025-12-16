@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Say it! - Plataforma de Convivencia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <div id="pantalla-login" class="fixed inset-0 z-50 bg-slate-100 flex flex-col justify-center items-center">
+        
+        <div class="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-gray-100">
+            <div class="text-6xl mb-6">💬</div>
+            <h1 class="text-4xl font-extrabold text-indigo-600 mb-2">Say it!</h1>
+            <p class="text-gray-500 mb-8">Plataforma de Convivencia Escolar</p>
+
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Soy...</label>
+                    <select id="rol-usuario" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition cursor-pointer">
+                        <option value="profesor">👨‍🏫 Profesor / Director</option>
+                        <option value="alumno">🎒 Estudiante</option>
+                        <option value="padre">🏠 Familia / Tutor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Usuario / ID</label>
+                    <input type="text" id="email" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Contraseña</label>
+                    <input type="password" id="password" value="" placeholder="********" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none">
+                </div>
+            </div>
+
+            <button type="button" onclick="iniciarSesion()" class="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+    🔒 Iniciar Sesión Segura
+</button>
+
+        <p class="mt-6 text-xs text-gray-400" id="login-msg">Acceso seguro y confidencial.</p>
+        </div>
+        
+        <div class="mt-8 text-gray-400 text-sm font-medium">
+            &copy; 2025 Say it! Education Systems
+        </div>
+    </div> 
+    <div id="vista-profesores" class="hidden flex h-screen bg-gray-50 w-full">
+        
+        ```
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between z-10">
+        <div>
+            <div class="h-16 flex items-center justify-center border-b border-gray-100">
+                <span class="text-xl font-bold text-indigo-600">🛡️ Say it!</span>
+            </div>
+            
+            <nav class="mt-6 px-4 space-y-2">
+                <button onclick="mostrarSeccion('buzon')" id="btn-buzon" class="w-full nav-item bg-gray-100 flex items-center px-4 py-3 text-gray-900 font-medium rounded-lg transition hover:bg-gray-50">
+                    <span class="mr-3">📬</span>
+                    <span>Buzón Informes</span>
+                    <span id="contador-buzon" class="ml-auto bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs font-bold">3</span>
+                </button>
+
+                <button onclick="mostrarSeccion('protocolos')" id="btn-protocolos" class="w-full nav-item flex items-center px-4 py-3 text-gray-600 rounded-lg transition hover:bg-gray-50">
+                    <span class="mr-3">📖</span>
+                    <span>Protocolos</span>
+                </button>
+
+                <button onclick="mostrarSeccion('historial')" id="btn-historial" class="w-full nav-item flex items-center px-4 py-3 text-gray-600 rounded-lg transition hover:bg-gray-50">
+                    <span class="mr-3">🔎</span>
+                    <span>Historial</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center space-x-3 mb-4 px-2">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">D</div>
+                <div class="text-sm">
+                    <p class="font-medium">Director/a</p>
+                    <p class="text-gray-500 text-xs">IES Ejemplo</p>
+                </div>
+            </div>
+            <button class="w-full text-left text-sm text-red-500 hover:text-red-700 px-2">
+                Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+        
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+            <h1 id="titulo-pagina" class="text-xl font-bold text-gray-800">Buzón de Informes</h1>
+            
+            <div class="flex items-center space-x-4">
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <span class="text-sm font-medium text-red-600">Atención requerida: 3 casos</span>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto bg-slate-50 p-8">
+            
+            <div id="seccion-buzon" class="seccion-contenido fade-in max-w-5xl mx-auto">
+                <div class="flex space-x-6 border-b border-gray-200 mb-6">
+                    <button class="pb-3 border-b-2 border-red-500 text-red-600 font-bold text-sm">PENDIENTES (3)</button>
+                    <button class="pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">EN SEGUIMIENTO (5)</button>
+                    <button class="pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">TODOS</button>
+                </div>
+
+                <div class="space-y-4">
+                    <div id="reporte-nuevo-inbox" class="hidden">
+    <div class="bg-yellow-50 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 hover:shadow-xl transition cursor-pointer flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4">
+        <div>
+            <div class="flex items-center space-x-2 mb-2">
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded border border-yellow-200">REPORTE ANONIMO</span>
+                <span class="text-gray-400 text-xs">• Recién recibido</span>
+                <span class="text-gray-400 text-xs font-mono font-bold" id="id-reporte-nuevo">#2025-004</span>
+            </div>
+            <h3 class="text-lg font-bold text-yellow-900">Mensaje de Alumno/Familia</h3>
+            <p class="text-yellow-800 text-sm mt-1">"Se ha enviado un nuevo reporte a través de la plataforma Say it! desde el Chatbot. Revisar el contenido..."</p>
+        </div>
+        <button onclick="abrirModal()" class="whitespace-nowrap bg-yellow-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-yellow-700 shadow-sm">
+            Atender Nuevo →
+        </button>
+    </div>
+</div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500 hover:shadow-md transition cursor-pointer flex flex-col md:flex-row justify-between md:items-center gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="bg-red-50 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-100">PRIORIDAD ALTA</span>
+                                <span class="text-gray-400 text-xs">• Recibido hace 2 horas</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">Posible acoso físico en vestuarios</h3>
+                            <p class="text-gray-600 text-sm mt-1">Reporte anónimo indicando agresión a un alumno de 1º ESO...</p>
+                        </div>
+                        
+                            <button onclick="abrirModal()" class="whitespace-nowrap bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm">
+    Atender Ahora →
+</button>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500 hover:shadow-md transition cursor-pointer flex flex-col md:flex-row justify-between md:items-center gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="bg-red-50 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-100">NUEVO</span>
+                                <span class="text-gray-400 text-xs">• Recibido ayer, 18:30</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">Ciberacoso en grupo de WhatsApp</h3>
+                            <p class="text-gray-600 text-sm mt-1">Delegado de clase aporta capturas de pantalla sobre insultos...</p>
+                        </div>
+                        <button class="whitespace-nowrap bg-white border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50">
+                            Revisar
+                        </button>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500 hover:shadow-md transition cursor-pointer flex flex-col md:flex-row justify-between md:items-center gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="bg-red-50 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-100">NUEVO</span>
+                                <span class="text-gray-400 text-xs">• Recibido ayer, 14:00</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">Aislamiento social en recreo</h3>
+                            <p class="text-gray-600 text-sm mt-1">Observación de profesor de guardia sobre alumno siempre solo...</p>
+                        </div>
+                        <button class="whitespace-nowrap bg-white border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50">
+                            Revisar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div id="seccion-protocolos" class="seccion-contenido hidden fade-in max-w-5xl mx-auto">
+                <div class="bg-indigo-600 rounded-xl p-8 text-white mb-8 shadow-lg">
+                    <h2 class="text-2xl font-bold mb-2">Marco Legal y Protocolos</h2>
+                    <p class="text-indigo-100">Consulta la normativa vigente nacional y autonómica.</p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
+                    <div class="flex items-start">
+                        <div class="text-4xl mr-5">🇪🇸</div>
+                        <div class="w-full">
+                            <h3 class="text-lg font-bold text-gray-900">Normativa Estatal (España)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <a href="#" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition">
+                                    <span class="text-red-500 font-bold mr-3">PDF</span>
+                                    <span class="text-sm font-medium text-gray-700">Ley Orgánica (LOPIVI)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                    <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Selecciona Comunidad Autónoma:</label>
+                    <select id="selectorCCAA" onchange="cambiarProtocolo()" class="block w-full md:w-1/2 p-3 border border-gray-300 rounded-lg bg-white">
+                        <option value="" disabled selected>-- Elegir región --</option>
+                        
+                        <option value="madrid">Comunidad de Madrid</option>
+                        <option value="valencia">Comunitat Valenciana</option>
+                        <option value="cataluna">Cataluña / Catalunya</option>
+                        <option value="andalucia">Andalucía</option>
+                        
+                        <option disabled>----------------</option>
+                        
+                        <option value="aragon">Aragón</option>
+                        <option value="asturias">Asturias</option>
+                        <option value="baleares">Islas Baleares</option>
+                        <option value="canarias">Canarias</option>
+                        <option value="cantabria">Cantabria</option>
+                        <option value="castillalamancha">Castilla-La Mancha</option>
+                        <option value="castillaleon">Castilla y León</option>
+                        <option value="ceuta">Ceuta</option>
+                        <option value="extremadura">Extremadura</option>
+                        <option value="galicia">Galicia</option>
+                        <option value="larioja">La Rioja</option>
+                        <option value="melilla">Melilla</option>
+                        <option value="murcia">Región de Murcia</option>
+                        <option value="navarra">Navarra</option>
+                        <option value="paisvasco">País Vasco / Euskadi</option>
+                    </select>
+                </div>
+
+
+                <div id="contenedor-protocolos-dinamico" class="mt-8 border-t border-gray-100 pt-6">
+                    
+                    <div id="empty-state" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+                        <p class="text-gray-500 font-medium">Selecciona una región arriba para ver sus documentos.</p>
+                    </div>
+
+                    <div id="madrid" class="protocolo-region hidden bg-white border-l-4 border-red-600 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Madrid</h3>
+                        <p class="text-gray-600 mb-2">Marco de convivencia de la Comunidad de Madrid.</p>
+                        <span class="text-indigo-600 text-sm font-bold cursor-pointer underline">Guía contra el Acoso Escolar (PDF)</span>
+                    </div>
+
+                    <div id="valencia" class="protocolo-region hidden bg-white border-l-4 border-orange-400 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Comunitat Valenciana</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                <span class="text-gray-800 font-medium">Modelo PREVI</span>
+                                <span class="text-indigo-600 text-sm font-bold cursor-pointer underline">Descargar</span>
+                            </li>
+                            <li class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                <span class="text-gray-800 font-medium">Guía actuación GVA</span>
+                                <span class="text-indigo-600 text-sm font-bold cursor-pointer underline">Descargar</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="cataluna" class="protocolo-region hidden bg-white border-l-4 border-yellow-500 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocols Catalunya</h3>
+                        <p class="text-gray-600 mb-2">Unitat de Suport a l’Alumnat (USAV).</p>
+                        <span class="text-indigo-600 text-sm font-bold cursor-pointer underline">Protocol de prevenció i intervenció</span>
+                    </div>
+
+                    <div id="andalucia" class="protocolo-region hidden bg-white border-l-4 border-green-600 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Andalucía</h3>
+                        <p class="text-gray-600 mb-2">Portal de Convivencia Escolar.</p>
+                        <span class="text-indigo-600 text-sm font-bold cursor-pointer underline">Protocolo de actuación</span>
+                    </div>
+
+                    <div id="aragon" class="protocolo-region hidden bg-white border-l-4 border-yellow-600 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Aragón</h3>
+                        <p class="text-gray-600">Protocolo DGA y Equipo de Orientación.</p>
+                    </div>
+
+                    <div id="asturias" class="protocolo-region hidden bg-white border-l-4 border-blue-400 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Asturias</h3>
+                        <p class="text-gray-600">Actuación ante situaciones de acoso (Educastur).</p>
+                    </div>
+
+                    <div id="baleares" class="protocolo-region hidden bg-white border-l-4 border-purple-500 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Illes Balears</h3>
+                        <p class="text-gray-600">Institut per a la Convivència (Convivèxit).</p>
+                    </div>
+
+                    <div id="canarias" class="protocolo-region hidden bg-white border-l-4 border-yellow-400 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Canarias</h3>
+                        <p class="text-gray-600">Servicio ACORAE y Guía de Actuación.</p>
+                    </div>
+
+                    <div id="cantabria" class="protocolo-region hidden bg-white border-l-4 border-red-700 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Cantabria</h3>
+                        <p class="text-gray-600">Unidad de Convivencia Escolar.</p>
+                    </div>
+
+                    <div id="castillalamancha" class="protocolo-region hidden bg-white border-l-4 border-red-900 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Castilla-La Mancha</h3>
+                        <p class="text-gray-600">Portal de Convivencia y Guía Docente.</p>
+                    </div>
+
+                    <div id="castillaleon" class="protocolo-region hidden bg-white border-l-4 border-red-600 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Castilla y León</h3>
+                        <p class="text-gray-600">Observatorio de la Convivencia (JCyL).</p>
+                    </div>
+
+                    <div id="ceuta" class="protocolo-region hidden bg-white border-l-4 border-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Ceuta</h3>
+                        <p class="text-gray-600">Unidad de Programas Educativos (UPE).</p>
+                    </div>
+
+                    <div id="extremadura" class="protocolo-region hidden bg-white border-l-4 border-green-700 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Extremadura</h3>
+                        <p class="text-gray-600">Decreto de Convivencia y Guía Educarex.</p>
+                    </div>
+
+                    <div id="galicia" class="protocolo-region hidden bg-white border-l-4 border-blue-300 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Galicia</h3>
+                        <p class="text-gray-600">Estratexia Galega (educonvives).</p>
+                    </div>
+
+                    <div id="larioja" class="protocolo-region hidden bg-white border-l-4 border-red-400 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos La Rioja</h3>
+                        <p class="text-gray-600">Inspección Técnica Educativa.</p>
+                    </div>
+
+                    <div id="melilla" class="protocolo-region hidden bg-white border-l-4 border-blue-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Melilla</h3>
+                        <p class="text-gray-600">Dirección Provincial del Ministerio.</p>
+                    </div>
+
+                    <div id="murcia" class="protocolo-region hidden bg-white border-l-4 border-red-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos R. de Murcia</h3>
+                        <p class="text-gray-600">Observatorio para la Convivencia (Decreto 16/2016).</p>
+                    </div>
+
+                    <div id="navarra" class="protocolo-region hidden bg-white border-l-4 border-red-600 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocolos Navarra</h3>
+                        <p class="text-gray-600">Asesoría de Convivencia (Educa).</p>
+                    </div>
+
+                    <div id="paisvasco" class="protocolo-region hidden bg-white border-l-4 border-green-500 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📍 Protocols Euskadi</h3>
+                        <p class="text-gray-600">Iniciativa Bizikasi.</p>
+                    </div>
+
+                </div> ```
+
+                        <div class="flex items-end">
+                            <button class="w-full bg-gray-800 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-gray-900 transition">
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Asunto</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10 Oct 2024</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Incidente en comedor (Reporte #102)</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Resuelto
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Ver ficha</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15 Sep 2024</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Conflicto reiterado 2º ESO</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Resuelto
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Ver ficha</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="modal-reporte" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+        
+        <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden transform transition-all scale-100 mx-4">
+            
+            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-white font-bold text-lg">Reporte #2391</h3>
+                    <span class="text-indigo-200 text-sm">Recibido: Hoy, 09:30 AM</span>
+                </div>
+                <button onclick="cerrarModal()" class="text-white hover:bg-indigo-700 rounded-full p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[70vh]">
+                
+                <div class="flex space-x-3 mb-6">
+                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Prioridad Alta</span>
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Acoso Físico</span>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Descripción de los hechos</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-800 leading-relaxed">
+                        "He visto cómo tres alumnos de 3ºB acorralaban a [Nombre Oculto] en los vestuarios después de educación física. Le han tirado la mochila a la ducha y le han empujado contra las taquillas. No es la primera vez que ocurre."
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-500 uppercase mb-1">Ubicación</h4>
+                        <p class="font-medium text-gray-900">Vestuarios Gimnasio</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-500 uppercase mb-1">Involucrados (Presuntos)</h4>
+                        <p class="font-medium text-gray-900">Alumnos 3º ESO B</p>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start">
+                    <span class="text-2xl mr-3">💡</span>
+                    <div>
+                        <h5 class="font-bold text-yellow-800 text-sm">Protocolo Sugerido</h5>
+                        <p class="text-sm text-yellow-700 mb-2">Según la normativa, este caso podría requerir apertura inmediata de expediente.</p>
+                        <button onclick="mostrarSeccion('protocolos'); cerrarModal()" class="text-indigo-600 font-bold text-sm underline">Consultar Protocolo de Agresión Física</button>
+                    <button onclick="irAProtocoloDirecto()" class="text-indigo-600 font-bold text-sm underline">
+    Consultar Protocolo de Agresión Física
+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                <button onclick="cerrarModal()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+                    Cerrar
+                </button>
+                <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium shadow-sm">
+                    Abrir Expediente
+                </button>
+            </div>
+        </div>
+    </div>
+
+<div id="seccion-historial" class="seccion-contenido hidden fade-in max-w-5xl mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Historial de Expedientes</h2>
+                <p class="text-gray-500 text-sm">Registro de casos cerrados o derivados (Curso 2024/25).</p>
+            </div>
+            
+            <div class="relative w-full md:w-64">
+                <input type="text" placeholder="Buscar alumno..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-600">
+                    <thead class="bg-gray-50 text-gray-800 font-semibold uppercase tracking-wider border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-4">ID Caso</th>
+                            <th class="px-6 py-4">Tipo</th>
+                            <th class="px-6 py-4">Fecha Cierre</th>
+                            <th class="px-6 py-4">Resolución</th>
+                            <th class="px-6 py-4 text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-mono text-xs font-bold text-gray-500">#2024-089</td>
+                            <td class="px-6 py-4 text-gray-900 font-medium">Disputa física en patio</td>
+                            <td class="px-6 py-4">12 Oct 2024</td>
+                            <td class="px-6 py-4">
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">✅ Mediación Exitosa</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-indigo-600 hover:text-indigo-900 font-medium">Ver ficha</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-mono text-xs font-bold text-gray-500">#2024-082</td>
+                            <td class="px-6 py-4 text-gray-900 font-medium">Rumores en red social</td>
+                            <td class="px-6 py-4">28 Sep 2024</td>
+                            <td class="px-6 py-4">
+                                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold border border-gray-200">📁 Falsa Alarma</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-indigo-600 hover:text-indigo-900 font-medium">Ver ficha</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-mono text-xs font-bold text-gray-500">#2024-075</td>
+                            <td class="px-6 py-4 text-gray-900 font-medium">Aislamiento reiterado</td>
+                            <td class="px-6 py-4">15 Sep 2024</td>
+                            <td class="px-6 py-4">
+                                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">⚖️ Protocolo Activado</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-indigo-600 hover:text-indigo-900 font-medium">Ver ficha</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Lógica para cambiar entre secciones (Menú Lateral)
+        function mostrarSeccion(idSeccion) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.seccion-contenido').forEach(el => el.classList.add('hidden'));
+            
+            // Quitar estilo activo a todos los botones
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-gray-100', 'text-gray-900', 'font-medium');
+                el.classList.add('text-gray-600');
+            });
+
+            // Mostrar la sección seleccionada
+            const seccion = document.getElementById('seccion-' + idSeccion);
+            if (seccion) seccion.classList.remove('hidden');
+
+            // Poner estilo activo al botón seleccionado
+            const btnActivo = document.getElementById('btn-' + idSeccion);
+            if (btnActivo) {
+                btnActivo.classList.remove('text-gray-600');
+                btnActivo.classList.add('bg-gray-100', 'text-gray-900', 'font-medium');
+            }
+
+            // Actualizar Título
+            const titulos = {
+                'buzon': 'Buzón de Informes',
+                'protocolos': 'Protocolos y Normativa',
+                'historial': 'Historial de Casos'
+            };
+            const tituloEl = document.getElementById('titulo-pagina');
+            if (tituloEl && titulos[idSeccion]) tituloEl.innerText = titulos[idSeccion];
+        }
+
+        // 2. Lógica para el selector de Comunidades (Protocolos)
+        function cambiarProtocolo() {
+            const paneles = document.querySelectorAll('.protocolo-region');
+            paneles.forEach(panel => panel.classList.add('hidden'));
+            
+            const emptyState = document.getElementById('empty-state');
+            if (emptyState) emptyState.classList.add('hidden');
+
+            const selector = document.getElementById('selectorCCAA');
+            if (selector) {
+                const seleccion = selector.value;
+                const panelSeleccionado = document.getElementById(seleccion);
+
+                if (panelSeleccionado) {
+                    panelSeleccionado.classList.remove('hidden');
+                } else {
+                    if (emptyState) emptyState.classList.remove('hidden');
+                }
+            }
+        }
+
+        // 3. Lógica de la Ventana Modal (Pop-up)
+        function abrirModal() {
+            document.getElementById('modal-reporte').classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-reporte').classList.add('hidden');
+        }
+
+        // Función paso a paso para evitar errores
+        function irAProtocoloDirecto() {
+            cerrarModal();
+            mostrarSeccion('protocolos');
+            
+            var selector = document.getElementById('selectorCCAA');
+            if (selector) {
+                selector.value = 'valencia';
+                cambiarProtocolo(); 
+            }
+        }
+    </script> </div> <div id="vista-chatbot" class="hidden h-screen bg-indigo-50 flex flex-col justify-between">
+        
+        <div class="bg-white p-4 shadow-sm flex justify-between items-center px-6">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-100 p-2 rounded-full"><span class="text-2xl">🤖</span></div>
+                <div>
+                    <h2 class="font-bold text-gray-800 text-lg">Asistente Say it!</h2>
+                    <p class="text-xs text-green-500 font-medium flex items-center gap-1">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span> En línea y seguro
+                    </p>
+                </div>
+            </div>
+            <button onclick="cerrarSesion()" class="text-sm text-gray-500 hover:text-red-500 font-medium">Salir</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-4">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-sm">🤖</div>
+                <div class="bg-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-gray-700 max-w-[85%]">
+                    <p>Hola. Estoy aquí para escucharte. 🛡️</p>
+                    <p class="mt-2">Todo lo que me cuentes es <strong>confidencial</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-white border-t border-gray-200">
+            <div class="max-w-4xl mx-auto flex items-center gap-4">
+                
+                <div class="relative flex-1">
+                    <input type="text" id="input-principal-chat" placeholder="Escribe aquí tu mensaje al asistente..." class="w-full pl-6 pr-14 py-4 rounded-full border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm outline-none transition">
+                    
+                    <button type="button" onclick="enviarMensajeChatbot()" class="absolute right-2 top-2 p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition shadow-md">
+                        <svg class="w-6 h-6 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </button>
+                </div>
+                
+                <button onclick="generarReporte()" class="bg-red-600 text-white font-bold py-4 px-6 rounded-full hover:bg-red-700 transition shadow-lg text-sm flex items-center gap-2 flex-shrink-0">
+                    🛡️ Generar Reporte
+                </button>
+            </div>
+            <p class="text-center text-xs text-gray-500 mt-2 font-medium" id="mensaje-reporte">
+                Úsalo cuando el asistente haya entendido el incidente y quieras enviarlo a la dirección.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------------
+        // 1. LÓGICA CHATBOT (Conectada a Flask)
+        // --------------------------------------------------------------------
+        function enviarMensajeChatbot() {
+            const input = document.getElementById('input-principal-chat');
+            const textoMensaje = input ? input.value.trim() : '';
+            const contenedorMensajes = document.querySelector('#vista-chatbot .overflow-y-auto');
+
+            if (!textoMensaje) return;
+
+            // Mostrar mensaje del usuario
+            const mensajeUsuarioHTML = `
+                <div class="flex justify-end mb-4">
+                    <div class="bg-indigo-600 text-white p-4 rounded-l-xl rounded-tr-xl shadow-sm max-w-[85%]">
+                        ${textoMensaje}
+                    </div>
+                </div>
+            `;
+            if (contenedorMensajes) {
+                contenedorMensajes.innerHTML += mensajeUsuarioHTML;
+                contenedorMensajes.scrollTop = contenedorMensajes.scrollHeight;
+            }
+
+            if (input) input.value = '';
+
+            // Enviar a Flask
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    pregunta: textoMensaje,
+                    usuario: localStorage.getItem('userEmail') || "anonimo"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const respuestaIA = data.respuesta || "Lo siento, no pude conectar con el servidor.";
+                const mensajeIAHTML = `
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-sm">🤖</div>
+                        <div class="bg-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-gray-700 max-w-[85%]">
+                            ${respuestaIA}
+                        </div>
+                    </div>
+                `;
+                if (contenedorMensajes) {
+                    contenedorMensajes.innerHTML += mensajeIAHTML;
+                    contenedorMensajes.scrollTop = contenedorMensajes.scrollHeight;
+                }
+            })
+            .catch(error => {
+                console.error('Error Chat:', error);
+            });
+        }
+
+        // --------------------------------------------------------------------
+        // 2. LÓGICA REPORTE (Conectada a Flask y PDF)
+        // --------------------------------------------------------------------
+        function generarReporte() {
+            const inputElement = document.getElementById('input-principal-chat');
+            const textoReporte = inputElement ? inputElement.value.trim() : '';
+            const mensajeDiv = document.getElementById('mensaje-reporte');
+            
+            // Usamos un texto por defecto si el input está vacío, para que la demo no falle
+            const textoFinal = textoReporte || "Reporte generado desde conversación con Chatbot (Resumen automático).";
+
+            const rol = localStorage.getItem('userRol');
+            const email = localStorage.getItem('userEmail');
+
+            if (mensajeDiv) {
+                mensajeDiv.innerText = "⏳ Generando expediente oficial...";
+                mensajeDiv.classList.remove('text-red-600', 'text-green-600', 'text-gray-500');
+                mensajeDiv.classList.add('text-blue-600', 'font-bold');
+            }
+
+            fetch('/api/generar-reporte', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    rol_denunciante: rol,
+                    user_email: email,
+                    texto_incidente: textoFinal
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (mensajeDiv) {
+                        mensajeDiv.innerText = '✅ ' + data.mensaje;
+                        mensajeDiv.classList.remove('text-blue-600');
+                        mensajeDiv.classList.add('text-green-600');
+                    }
+                    setTimeout(() => { location.reload(); }, 3000);
+                } else {
+                    if (mensajeDiv) {
+                        mensajeDiv.innerText = '❌ Error: ' + data.mensaje;
+                        mensajeDiv.classList.add('text-red-600');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error Reporte:', error);
+                if (mensajeDiv) mensajeDiv.innerText = '⚠️ Error de conexión.';
+            });
+        }
+        
+        // --------------------------------------------------------------------
+        // 3. LÓGICA LOGIN (Conectada a Flask)
+        // --------------------------------------------------------------------
+        function iniciarSesion() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const mensajeLogin = document.getElementById('login-msg');
+
+            if (!emailInput || !passwordInput || !mensajeLogin) {
+                console.error("Faltan elementos HTML (IDs: email, password, login-msg)");
+                return;
+            }
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!email || !password) {
+                mensajeLogin.innerText = "❌ Ingresa email y contraseña.";
+                return;
+            }
+
+            mensajeLogin.innerText = "Conectando...";
+            mensajeLogin.style.color = "blue";
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password })
+            })
+            .then(response => response.json().then(data => {
+                if (response.ok) {
+                    localStorage.setItem('userEmail', data.user_email);
+                    localStorage.setItem('userRol', data.rol);
+                    localStorage.setItem('userName', data.user_name);
+                    
+                    mensajeLogin.innerText = "✅ " + data.message;
+                    mensajeLogin.style.color = "green";
+                    
+                    setTimeout(() => {
+                        // Ocultar login
+                        document.getElementById('pantalla-login').classList.add('hidden');
+                        
+                        // Redirigir según rol
+                        if (data.rol === 'profesor' || data.rol === 'director') {
+                            const vistaProfe = document.getElementById('vista-profesores');
+                            if (vistaProfe) {
+                                vistaProfe.classList.remove('hidden');
+                                // Si la función existe (está en otro script), la llamamos
+                                if (typeof mostrarSeccion === 'function') mostrarSeccion('buzon');
+                            }
+                        } else {
+                            const vistaChat = document.getElementById('vista-chatbot');
+                            if (vistaChat) vistaChat.classList.remove('hidden');
+                        }
+                    }, 1000);
+
+                } else {
+                    mensajeLogin.innerText = "❌ " + (data.message || "Error de login");
+                    mensajeLogin.style.color = "red";
+                }
+            }))
+            .catch(error => {
+                console.error('Error:', error);
+                mensajeLogin.innerText = "⚠️ Error de conexión (Flask).";
+                mensajeLogin.style.color = "red";
+            });
+        }
+
+        // 4. Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            const reporteEnviado = localStorage.getItem('reporteEnviado');
+            if (reporteEnviado === 'si') {
+                // Lógica visual para mostrar que hay un nuevo reporte (opcional)
+                const contador = document.getElementById('contador-buzon');
+                if (contador) contador.innerText = '4';
+            }
+        });
+    </script>
+</body>
+</html>
