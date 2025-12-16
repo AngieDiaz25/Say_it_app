@@ -75,5 +75,6 @@ class Informe(db.Model):
     fecha_informe = db.Column(DateTime, default=datetime.utcnow)
     tipo_bullying = db.Column(String(50))
     descripcion = db.Column(String(1000))
+    estado = db.Column(String(20), default="Pendiente")  # Pendiente, En Proceso, Resuelto
     id_centro_estudios = db.Column(Integer, ForeignKey('centro_estudios.id_centro_estudios'))
     id_director = db.Column(Integer, ForeignKey('directores.id_director'))
