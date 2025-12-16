@@ -1,21 +1,14 @@
-# --- Entornos Virtuales y Configuración del Sistema ---
-venv/
 .env
 .DS_Store
 __pycache__/
 *.pyc
-
-# --- Bases de Datos y Archivos Locales ---
+venv/
+.venv/
+env/
 *.db
-instance/
+*.sqlite3
 chroma_db/
-documentos_rag/
-
-# --- Logs y Reportes Generados ---
-logs/
-reports/
 data/reports/*.pdf
-
-# --- Carpetas temporales de IDEs ---
+data/logs/*.log
+.vscode/
 .idea/
-.vscode/.env
