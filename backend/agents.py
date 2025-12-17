@@ -3,68 +3,103 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import json
 
-# Cargar entorno
 load_dotenv()
 api_key = os.getenv("GOOGLE_API_KEY")
 model = None
 
-# Configuración DIRECTA al modelo compatible
+# --- CONFIGURACION ---
 if api_key:
     try:
         genai.configure(api_key=api_key)
-        # Usamos 'gemini-pro' que funciona en librerías antiguas
-        model = genai.GenerativeModel("gemini-pro")
-        print("✅ IA CONECTADA: Usando Gemini Pro (Compatibilidad)")
+        # Usamos tu modelo disponible
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        print("✅ IA CONECTADA: Backend listo con Gemini 2.5 Flash")
     except Exception as e:
-        print(f"❌ Error configuración: {e}")
+        print(f"❌ Error configuración IA: {e}")
 else:
-    print("⚠️ Sin API Key.")
+    print("⚠️ ADVERTENCIA: No se encontró GOOGLE_API_KEY en .env")
+
+# --- PROTOCOLO (RAG MEJORADO Y HUMANIZADO) ---
+PROTOCOLO_SEGURIDAD = """
+ERES 'SAY IT', UN ASISTENTE VIRTUAL DE CONVIVENCIA ESCOLAR.
+TU TONO: Calmado, seguro, confidencial y profesional.
+
+REGLAS DE INTERACCIÓN:
+
+1. FASE DE SALUDO (IMPORTANTE):
+   - Si el usuario dice "Hola", "Buenas", o saluda simple: NO asumas inmediatamente que ha pasado algo grave.
+   - Respuesta correcta: "Hola. Estoy aquí para escucharte de forma segura y confidencial. ¿Quieres contarme algo o necesitas ayuda?"
+   - Respuesta INCORRECTA: "Siento que estés mal" (No lo digas si no sabes qué pasa).
+
+2. FASE DE ESCUCHA (Cuando cuenten el problema):
+   - Ahora SÍ muestra empatía: "Siento mucho que estés pasando por eso."
+   - Tu objetivo es conseguir 3 datos clave sin parecer un interrogatorio policial:
+     A) QUÉ (Descripción de los hechos).
+     B) QUIÉN (Nombres o descripción de los agresores).
+     C) CUÁNDO/DÓNDE (Fecha y lugar).
+
+3. FASE DE CIERRE:
+   - Si tienes los datos o el alumno no quiere hablar más, recuérdale que puede usar el botón "Generar Reporte" para enviar la información a dirección.
+
+EJEMPLO DE FLUJO IDEAL:
+- Usuario: "Hola"
+- Tú: "Hola. Aquí puedes hablar con confianza. ¿Cómo puedo ayudarte?"
+- Usuario: "Es que se meten conmigo"
+- Tú: "Lo siento mucho, nadie debería pasar por eso. ¿Puedes decirme quién te está molestando?"
+"""
 
 def responder_alumno(historial, mensaje_usuario):
-    if model:
-        try:
-            # Prompt directo
-            prompt = f"""Eres el asistente escolar 'Say It'.
-            Tu objetivo es recopilar información sobre incidentes (Qué, Quién, Cuándo).
-            Sé breve y empático.
-            
-            Usuario: {mensaje_usuario}"""
-            
-            response = model.generate_content(prompt)
-            return response.text
-        except Exception as e:
-            print(f"Error IA: {e}")
-            # Si falla, el usuario no verá el error, pasamos al fallback limpio
-            pass 
+    if not model:
+        return "⚠️ Error: IA no conectada."
 
-    # Fallback LIMPIO (Sin poner 'Modo Respaldo' para que sirva en la demo)
-    return "Entendido. Por favor, descríbeme con detalle qué ha sucedido, cuándo ocurrió y quiénes son las personas implicadas para poder registrarlo."
+    try:
+        historial_texto = ""
+        for item in historial:
+            if isinstance(item, (list, tuple)) and len(item) >= 2:
+                human = item[0]
+                ai = item[1]
+                if human and ai:
+                    historial_texto += f"Alumno: {human}\nSay It: {ai}\n"
+
+        prompt_completo = f"""
+        {PROTOCOLO_SEGURIDAD}
+        
+        HISTORIAL PREVIO:
+        {historial_texto}
+        
+        NUEVO MENSAJE DEL ALUMNO:
+        {mensaje_usuario}
+        
+        TU RESPUESTA (Directa y orientada a conseguir los datos):
+        """
+        
+        response = model.generate_content(prompt_completo)
+        return response.text
+        
+    except Exception as e:
+        print(f"🔥 ERROR CHAT: {e}")
+        return "Disculpa, he tenido un fallo técnico. ¿Puedes repetirlo?"
 
 def generar_reporte_riesgo(historial_chat):
-    # Intentamos generar reporte con IA, si falla usamos datos estáticos
-    if model:
-        try:
-            prompt = f"""Analiza este chat y extrae JSON:
-            {{
-                "rol_informante": "VÍCTIMA",
-                "tipo_incidente": ["Acoso"],
-                "nivel_gravedad": "GRAVE",
-                "resumen_hechos": "Resumen breve",
-                "nombres_involucrados": ["Nombre1"]
-            }}
-            Chat: {str(historial_chat)}"""
-            
-            response = model.generate_content(prompt)
-            clean = response.text.replace("```json", "").replace("```", "").strip()
-            return json.loads(clean)
-        except:
-            pass
-            
-    # Datos de respaldo silenciosos para que el PDF se genere sí o sí
-    return {
-        "rol_informante": "VÍCTIMA",
-        "tipo_incidente": ["Agresión Física (Reporte Manual)"],
-        "nivel_gravedad": "GRAVE",
-        "resumen_hechos": "El alumno reporta incidentes de agresión en el entorno escolar. Se requiere intervención inmediata del tutor.",
-        "nombres_involucrados": ["Carlos Pérez", "Ana García"]
-    }
+    if not model:
+        raise ConnectionError("Sin API Key")
+
+    chat_str = str(historial_chat)
+    prompt_analisis = f"""
+    Actúa como analista. Extrae JSON puro de este chat:
+    {chat_str}
+    
+    JSON ESPERADO:
+    {{
+        "rol_informante": "VÍCTIMA" o "TESTIGO",
+        "tipo_incidente": ["Físico", "Verbal", "Ciber"],
+        "nivel_gravedad": "LEVE", "MODERADO" o "GRAVE",
+        "resumen_hechos": "Resumen en 3 persona (max 30 palabras)",
+        "nombres_involucrados": ["Nombres o Desconocido"]
+    }}
+    """
+    
+    response = model.generate_content(prompt_analisis)
+    texto_limpio = response.text.replace("```json", "").replace("```", 
+"").strip()
+    return json.loads(texto_limpio)
